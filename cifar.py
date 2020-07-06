@@ -93,6 +93,11 @@ parser.add_argument(
     type=int,
     help='Depth of augmentation chains. -1 denotes stochastic depth in [1, 3]')
 parser.add_argument(
+    '--alpha',
+    default=1.0,
+    type=float,
+    help='Parameter of distributions for the mixing')
+parser.add_argument(
     '--aug-severity',
     default=3,
     type=int,
@@ -163,8 +168,8 @@ def aug(image, preprocess):
   if args.all_ops:
     aug_list = augmentations.augmentations_all
 
-  ws = np.float32(np.random.dirichlet([1] * args.mixture_width))
-  m = np.float32(np.random.beta(1, 1))
+  ws = np.float32(np.random.dirichlet([args.alpha] * args.mixture_width))
+  m = np.float32(np.random.beta(args.alpha, args.alpha))
 
   mix = torch.zeros_like(preprocess(image))
   for i in range(args.mixture_width):
